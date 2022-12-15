@@ -1,0 +1,67 @@
+local function msg(x) print(x) end
+function formAccess(form, textbox)
+  textbox.Text = form.Text       -->Expect an object, but got a string! -- textbox.Text = form.button1.Text  -->Nil
+  return true, textbox
+end
+function Console(command)
+	local console = assert(io.popen(command))
+	output =console:read("*a")
+	console:close()
+	return output
+end
+function ConsoleEmbedded()
+	local console = assert(io.popen(commandStatement))
+	output =console:read("*a")
+	console:close()
+	return output
+end
+-------------------------------------------------------------------------------------------
+local function getActive() local akt = Console("powercfg /GETACTIVESCHEME","Current Plan") local found= string.find(akt, ": ")
+                        return string.sub(akt,found+41,akt:len()-1) end
+local function set() Console("powercfg /setactive "..espCode,espCode.."  Set Plan") end
+------------------------Collecting the ESP_Codes --------------------------
+getIndex =1 anzESP=5
+local foundIndex=0  local i=1 local ausgabe = {}
+local function getESP() --- => Split:String => Nächste_Suche => ---
+    espList = Console("powercfg /list","getESP")
+    for index=i, anzESP do
+        foundIndex= string.find(espList, ": ")+1 --("%") für einzelne Buchstaben
+        i=foundIndex+1 --NextCut:Start_Index
+        -- print("ESP_ID"..index..": "..string.sub(espList,i,i+37))
+        table.insert(ausgabe,string.sub(espList,i,i+37))                 --Add:ESP_Code
+        espList = string.sub(espList,i+37,espList:len())
+        nameIndex,nameEndIndex = string.find(espList, "%(")+1, string.find(espList, ")")-1 --Get:Name
+        table.insert(ausgabe,string.sub(espList,nameIndex,nameEndIndex)) --Add:ESP_Name
+        --print(string.sub(espList,nameIndex,nameEndIndex))
+    end
+    return ausgabe
+end
+-------------------------------------------------------------------------------
+Sys = {
+	Esp = {
+		list = getESP, active = getActive, set = set 
+	},
+	CMD = {
+		cmd = ConsoleEmbedded,console = ConsoleEmbedded
+	},
+}
+
+aktESP = Sys.Esp.active()
+action = Sys[namespace][userCommand]
+Response = action()
+
+
+if namespace == "Esp" then
+	print(aktESP.."  Found ESP: "..#Response/2)
+
+	return true, Response[getIndex], Response[getIndex+1],Response[getIndex+2], Response[getIndex+3], Response[getIndex+4], Response[getIndex+5], Response[getIndex+6],
+        Response[getIndex+7], Response[getIndex+8], Response[getIndex+9], Response[getIndex+10], Response[getIndex+11],aktESP
+elseif Response then
+	return true,Response,aktEsp
+else
+	Error = "Failed Script(No Content)"
+	return false, Response,Error,aktEsp 
+end
+--	ListView.BeginUpdate();
+--	  // your code
+--	ListView.EndUpdate()

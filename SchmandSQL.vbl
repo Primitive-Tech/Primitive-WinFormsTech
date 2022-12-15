@@ -1,0 +1,103 @@
+local sys =require "os" local maths =require "math" 
+------------------- Implement_ObjectMethods ----------------------
+getByID = function(collection,n) t = {} for collectionInt,obj in pairs(collection) do if obj.name == n then return obj end  end end
+function typeOf(self)
+    if asString then return toString(type(self))
+    else
+        return type(self)
+    end 
+end
+------------------- Implement_Prototypes -----------------------
+Objgroup,UIgroup  = { },{ } 
+local dataset = { 
+        type = typeOf, count = count, get = get, set = set, 
+        "vbl", -1,  me = me , group = group, id = id }
+function newObject(dataset)
+    local obj = {}
+    function obj:new(data) 
+        data = data or {}
+        self.me = me or { }
+        self.type = typeOf
+        self.id = id or 0.1
+        self.group = group or {}
+        self.count = function(obj) return #obj end
+        self.get = function(var) return self.me[tostring(var)] end -- refIn = newObj:set("x", "ID")
+        self.set = function(var, val) self.me[tostring(var)] = val end-- refOut = newObj:get("ID"))
+        setmetatable(data,self)
+        self.__index = self
+        return data
+    end
+    local newObj = obj:new(dataset)
+    return newObj 
+end
+------ TestExamples -----
+newObj = newObject(dataset) -- <== BaseClass
+object3 = newObj:new({ group = Objgroup, id = 0.11}) object2 = newObject({id = 0.3})
+newObj.group = UIgroup    object2.group = Objgroup
+--print(newObj.id.." "..newObj:type(),#newObj.group)
+--------------------- MATHE ---------------------------------------- MATHE ---------------------------------------
+function sum(x,y)
+    if y == nil then 
+        return x + x
+    else
+        return x + y 
+    end
+end
+function diff(x,y)
+        if y == nil then 
+            return x - x
+    else
+        return x - y 
+    end
+end
+function multipl(x,y)
+    if y == nil then 
+        return x * x
+    else
+        return x * y 
+    end
+end
+function ratio(x,y)
+        if y == nil then 
+            return x / x
+    else
+        return x / y 
+    end
+end
+------------------------- Helpful --------------------------- Helpful -------------------------------------------------------------------------------------------------------
+function call(args)
+   return false, { x = 1},0 ,"xxx" ,args[1]
+end
+function formAccess(form, input,e,args)
+ -- textbox.Text = form.button1.Text  -->Nil
+  form.Text = input       -->Expect an object, but got a string!
+  form[input] = e
+  return true, textbox
+end
+function cmdAccess(cmd)
+    local console = io.popen(cmd) --if the echo programm exit with success it will return 0.
+    local response = console:read("*a")
+    console:close()
+  return true, response
+end
+function splitStr(str, startIndex,lastIndex)
+    last = -1 if lastIndex ~= nil then last = lastIndex end
+    if str ~= nil then return true,string.sub(str,startIndex,lastIndex) else return false end
+end
+function findStr(str,x)
+    if #str == 1 then x = "%"..x end
+    foundIndex, lastIndex= string.find(str, x) --("%") für einzelne Buchstaben
+    i=foundIndex+1 --NextCut:Start_Index
+    if foundIndex ~= nil then return true, foundIndex-1, lastIndex-1 else return false, 0, 0 end
+end
+------------------------------------------------------------------------------------------------------------------------------------------------------
+--Returns the substring of s that starts at i and continues until j; If j is absent, then it is assumed to be equal to -1 (which is the same as the string length)
+--for k, v in pairs(os.date("*t")) do print(k, v) end
+--------------------- Application_Methods ------------- Application_Methods -------------------------------------
+delegates = { cmd = cmdAccess}
+function run(bezeichner)
+   return delegates[bezeichner]()
+end
+getPath = function() return io.popen("cd"):read() end
+print(response)
+return true,response,body,namespace 
